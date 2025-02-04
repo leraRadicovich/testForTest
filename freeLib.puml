@@ -1,0 +1,1199 @@
+@startuml
+/'1. ПАРАМЕТРЫ И РУБИЛЬНИКИ
+========================================================================================================================='/
+
+/'Счетчики'/
+!$id = 0    /'Счетчик стрелок'/
+!$techId = 0    /'Технический счетчик для всех элементов на диаграмме'/
+!$todoId = 0    /'Счетчик списка доработок'/
+!$auditId = 0   /'Счетчик событий аудита'/
+!$copyId = 0    /'Счетчик копирования'/
+!$layerId = 0   /'Счетчик слоев диаграммы'/
+
+/'Вспомогательные буферные параметры'/
+
+!$aliasSearchResult = ""
+
+!$idInitiator = ""
+!$idExecutor = ""
+!$idAction = ""
+!$idComment = ""
+!$idLiveline = ""
+!$idType = ""
+!$idLayer = ""
+!$idLayerId = ""
+
+!$auditIdEvent = ""
+!$auditIdStatus = ""
+!$auditIdStartEvent = ""
+!$auditIdFinishEvent = ""
+!$auditIdDescriptionEvent = ""
+
+!$getAction = ""
+!$getComment = ""
+!$textResult = ""
+!$getInitiator = ""
+!$getExecutor = ""
+!$getLiveline = ""
+!$getType = ""
+!$getLayer = ""
+!$getIdLayerId = ""
+
+!$getInitiatorName = ""
+!$getExecutorName = ""
+
+!$getEvent = ""
+!$getStatusEvent = ""
+!$getStartEvent = ""
+!$getFinishEvent = ""
+!$getDescriptionEvent = ""
+
+!$originalLayer = ""
+!$getOriginalLayer = ""
+
+!$typeTechId = ""
+!$typeParam1 = ""
+!$typeParam2 = ""
+!$typeParam3 = ""
+!$typeParam4 = ""
+!$typeParam5 = ""
+
+!$getTypeTechId = ""
+!$getTypeParam1 = ""
+!$getTypeParam2 = ""
+!$getTypeParam3 = ""
+!$getTypeParam4 = ""
+!$getTypeParam5 = ""
+
+!$colorResult = ""
+
+/'Параметры, ограничивающие длину строк в ячейках в таблице'/
+!$actionLength = 20
+!$commentLengthFinal = 30
+!$commentLengthDraft = 60
+
+/'Переменные с заголовками для легенды диаграммы'/
+!$processMapFinal = "| # | Тип взаимо-\n действия | Порядок\n сценария | Тип\n сценария | Инициатор | Исполнитель | Действие | Комментарий |"
+!$processMapDraft = "| # | Комментарий |"
+!$auditTable = "| # | name | start | finish | status | description |"
+
+/'Выявленные в процессе моделирования доработки'/
+!$todoList = "| № | id обнаружения | Суть доработки|"
+
+/'Рубильники включения функций'/
+!$processMapEnabled = 0
+!$auditMapEnabled = 0
+!$todoMapEnabled = 0
+!$maxCopyActionsCount = 5
+!$initialSyntaxMapEnabled = 0
+!$mode = ""
+!$Libmode = ""
+!$sequenceName = ""
+
+/'Параметры стиля'/
+!$style = ["autonumber",
+"skinparam dpi 70",
+"skinparam maxMessageSize 200",
+"skinparam backgroundColor LightGray",
+"skinparam sequence {",
+"ArrowColor blue",
+"ActorBorderColor blue",
+"LifeLineBorderColor blue",
+"LifeLineBackgroundColor #White",
+"ParticipantBorderColor blue",
+"ParticipantBackgroundColor DodgerBlue",
+"ParticipantFontName Impact",
+"ParticipantFontSize 17",
+"ParticipantFontColor #A9DCDF",
+"ActorBackgroundColor DodgerBlue",
+"ActorFontColor DeepSkyBlue",
+"ActorFontSize 17",
+"ActorFontName Aapex",
+"}"
+]
+
+/'Мапа алиасов'/
+!$aliasMap = {"partiyTypes": [
+    {"item" : "user",
+    "type" : "actor"
+    },
+    {"item" : "client",
+    "type" : "actor"
+    },
+    {"item" : "redis",
+    "type" : "database"
+    },
+    {"item" : "PostgreSql",
+    "type" : "database"
+    },
+    {"item" : "postgre",
+    "type" : "database"
+    },
+    {"item" : "postgreSQL",
+    "type" : "database"
+    },
+    {"item" : "kafka",
+    "type" : "queue"
+    },
+    {"item" : "rabbit",
+    "type" : "queue"
+    },
+    {"item" : "MQ",
+    "type" : "queue"}
+]
+}
+
+!$proceduresDescription = "| Наименование | Описание | Исходный синтаксис | Пример | Переменные |"
+
+/'Описание процедур'/
+!$procHelpMap = {"procedures": [
+{"name" : "rq",
+"description" : "Рисует сплошную стрелку от участника-инициатора к участнику-исполнителю",
+"originalSyntax" : "->",
+"example" : "rq(initiator,executor,liveline,action,comment)",
+"variables" : "initiator - инициатор,executor - исполнитель,liveline - линия жизни,action - текст над стрелкой,comment - текст комментария"},
+{"name" : "rs",
+"description" : "Рисует пунктирную стрелку от участника-инициатора к участнику-исполнителю",
+"originalSyntax" : "-->",
+"example" : "rs(initiator,executor,liveline,action,comment)",
+"variables" : "initiator - инициатор,executor - исполнитель,liveline - линия жизни,action - текст над стрелкой,comment - текст комментария"},
+{"name" : "parties",
+"description" : "Рисует участников диаграммы",
+"originalSyntax" : "participant имя as алиас order",
+"example" : "parties(type,name,as,order)",
+"variables" : "type - тип участника,name - имя участника,as - вспомогательная переменная,order - порядок расположения"},
+{"name" : "copyAction",
+"description" : "Копиррует данные последней нарисованной стрелки в режиме draft",
+"originalSyntax" : "-",
+"example" : "copyAction()",
+"variables" : "-"},
+{"name" : "auditNote",
+"description" : "Рисует таблицу с событиями аудита",
+"originalSyntax" : "-",
+"example" : "auditNote()",
+"variables" : "-"},
+{"name" : "audit",
+"description" : "Рисует нотификацию об отправке события в аудит",
+"originalSyntax" : "-",
+"example" : "audit(event,status,desc,participant)",
+"variables" : "event - имя события,status - статус, может быть пустым,desc - описание для таблицы,participant - линия участника, на которой будет отображена нотификация"},
+{"name" : "anc",
+"description" : "Якорь, запоминает текущее значение autonumber",
+"originalSyntax" : "-",
+"example" : "anchor(name)",
+"variables" : "name - имя якоря"},
+{"name" : "BOX",
+"description" : "Рисует объединение участников в бокс",
+"originalSyntax" : "box nameBox color",
+"example" : "BOX(name,color)",
+"variables" : "name - наименование бокса,color - цвет бокса"},
+{"name" : "ALT",
+"description" : "Рисует выделение альтернативного сценария",
+"originalSyntax" : "alt color case",
+"example" : "ALT(color,description",
+"variables" : "color - цвет кейса,description - описание кейса"},
+{"name" : "OPT",
+"description" : "Рисует выделение опционального сценария",
+"originalSyntax" : "opt color case",
+"example" : "OPT(color,description",
+"variables" : "color - цвет кейса,description - описание кейса"},
+{"name" : "PAR",
+"description" : "Рисует выделение параллельного сценария",
+"originalSyntax" : "par color case",
+"example" : "PAR(color,description",
+"variables" : "color - цвет кейса,description - описание кейса"},
+{"name" : "GROUP",
+"description" : "Рисует выделение сгруппированного сценария",
+"originalSyntax" : "group color case",
+"example" : "GROUP(color,description",
+"variables" : "color - цвет кейса,description - описание кейса"},
+{"name" : "LOOP",
+"description" : "Рисует выделение цикличного сценария",
+"originalSyntax" : "loop color case",
+"example" : "LOOP(color,description",
+"variables" : "color - цвет кейса,description - описание кейса"},
+{"name" : "ELSE",
+"description" : "Рисует выделение альтернативного сценария",
+"originalSyntax" : "elst color case",
+"example" : "ELSE(color,description",
+"variables" : "color - цвет кейса,description - описание кейса"},
+{"name" : "END",
+"description" : "Закрывает текущее выделение сценария любого типа, либо бокса",
+"originalSyntax" : "end или end box",
+"example" : "END(color,description",
+"variables" : "-"},
+{"name" : "NOTE",
+"description" : "Рисует заметку в заданном месте",
+"originalSyntax" : "note across: или note over participant:",
+"example" : "NOTE(position1,position2,color,description)",
+"variables" : "position1,position2 - управляют положением заметки,color - цвет фона заметки,description - содержание, текст заметки"},
+{"name" : "REF",
+"description" : "Рисует ссылку в заданном месте",
+"originalSyntax" : "ref across: или ref over participant:",
+"example" : "REF(position1,position2,color,description)",
+"variables" : "position1,position2 - управляют положением ссылки, color - цвет фона ссылки, description - содержание, текст ссылки"},
+{"name" : "ACTIVATE",
+"description" : "Рисует линию жизни участника",
+"originalSyntax" : "activate participantname",
+"example" : "ACTIVATE(party)",
+"variables" : "party - алиас участника"},
+{"name" : "DEACTIVATE",
+"description" : "Завершает линию жизни участника",
+"originalSyntax" : "deactivate participantname",
+"example" : "DEACTIVATE(party)",
+"variables" : "party - алиас участника"},
+{"name" : "processMapNote",
+"description" : "Рисует заметку с картой процесса",
+"originalSyntax" : "-",
+"example" : "processMapNote(x)",
+"variables" : "x - передано любое значение, будет нарисована карта для последней стрелки, иначе будет нарисована для всех стрелок"},
+{"name" : "todoNote",
+"description" : "Рисует таблицу со списком доработок",
+"originalSyntax" : "-",
+"example" : "todoNote()",
+"variables" : "-"},
+{"name" : "diagrammInit",
+"description" : "Инициирует диаграмма, рисует заголовок с параметрами",
+"originalSyntax" : "-",
+"example" : "diagrammInit(draft,originalSyntax,name)",
+"variables" : "mode - режим работы для постановок (draft, final), originalSyntax - флаг генерации оригинального синтаксиса, name - заголовок диаграммы"},
+{"name" : "LEGEND",
+"description" : "Рисует легенду диаграммы в зависимости от режима работы",
+"originalSyntax" : "-",
+"example" : "LEGEND()",
+"variables" : "-"},
+{"name" : "ORIGINAL",
+"description" : "Генерирует заметку с исходным синтаксисом",
+"originalSyntax" : "-",
+"example" : "ORIGINAL()",
+"variables" : "-"},
+{"name" : "HELP",
+"description" : "Генерирует заметку с описанием процедур",
+"originalSyntax" : "-",
+"example" : "HELP(procName)",
+"variables" : "procName - имя процедуры, если пустое показывает все"}
+]
+}
+
+
+/'Мапа режимов работы с диаграммой'/
+!$diagrammModeMap = [
+"draft",
+"final"
+]
+
+/'Мапа управляющих параметров заметок'/
+!$noteModeMap = [
+"right",
+"left",
+"over"
+]
+
+/'Проверки и ошибки'/
+    /'Процедура для проверки доступности функций'/
+    !unquoted procedure checkFeaturesEnabled($feature, $param1="", $param2="")
+    /'Проверяем режим работы библиотеки'/
+    !if $mode == ""
+        ! assert Диаграмма не инициализирована, для инициализации вызовите процедуру diagrammInit с параметрами: mode, originalSyntaxRequired, sequenceName
+    !endif
+
+    /'Проверяем корректность указания режима'/
+    !if $feature == diagrammInit
+        !$i = 0
+        !foreach $item in $diagrammModeMap
+            !if $param1 == $item
+                !$i = $i + 1
+            !endif
+        !endfor
+        !if $i == 0
+            !assert Указан некорректный режим работы с диаграммой
+        !endif
+    !endif
+
+    /'Проверяем доступность легенды'/
+    !if $feature == LEGEND && $processMapEnabled == 0  && $todoMapEnabled == 0  && $auditMapEnabled == 0
+        !assert Процедура LEGEND не содержит данных для отображения: карта процесса, списки доработок и событий аудита выключены
+    !endif
+
+    /'Проверяем доступность копирования стрелок'/
+    !if $feature == copyAction && $copyId > ($maxCopyActionsCount)
+        !assert Копирование невозможно, превышен лимит
+    !endif
+
+    /'Проверяем доступность автоподстановки скопированных стрелок'/
+    !if $feature == autoInsertAction && $param1 != "actionController"
+        !assert Процедура не доступна для вызова вне сервисной логики
+    !elseif $feature == autoInsertAction && $param2 == ""
+        !assert Указатель на шаг сценария $i не передан или стрелка с этим указателем не скопирована
+    !elseif $feature == autoInsertAction && %intval($param2) > %intval($id)
+        !assert В текущий момент на диаграмме нет стрелки с этим номером
+    !endif
+
+    /'Проверяем корректность работы с layer слоями диаграммы'/
+    !if $feature == ELSE && $param1 == 0
+        !assert Не задано исходное условие (alt,par,opt)
+    !elseif $feature == END && $param1 == 0
+        !assert Не задано исходное условие (alt,par,opt)
+    !endif
+
+    /'Проверяем корректность работы процедуры NOTE'/
+    !if $feature == NOTE
+        !$i = 0
+        !$ii = 0
+        !foreach $item in $noteModeMap
+            !if $param1 == $item || $param2 == $item
+                !$i = $i + 1
+            !elseif $param1 != $item && $param2 == $item
+                !$i = $i + 1
+            !endif
+        !endfor
+        !if $i > 1
+        !assert Положение заметки не может быть указано дважды или указано некорректно
+        !endif
+
+        !if $param1 == "" && $param2 != ""
+        !assert Положение заметки не указано
+        !endif
+
+        !if $param1 == "over" && $param2 == ""
+        !assert Заметка не может быть расположена поверх пустоты
+        !endif
+    !endif
+
+    /'Проверяем корректность вызова parties'/
+    !if $feature == parties && $param1 == ""
+        !assert При использовании процедуры parties вы забыли указать alias участника
+    !endif
+!endprocedure
+
+/'2. СЛУЖЕБНЫЕ ПРОЦЕДУРЫ
+=========================================================================================================================
+Процедуры, выполняющие служебные функции и операции с параметрами'/
+
+/'Процедура установки и проверки конфигурации библиотеки'/
+!unquoted procedure setConfiguration($Libmode, $originalSyntaxRequired)
+    !$mode = $Libmode
+    !if $mode == "draft"
+        !$processMapEnabled = 0
+        !$auditMapEnabled = 1
+        !$todoMapEnabled = 1
+    !elseif $mode == "final"
+        !$processMapEnabled = 1
+        !$auditMapEnabled = 0
+        !$todoMapEnabled = 0
+    !endif
+
+    !if $originalSyntaxRequired == 1
+        !$initialSyntaxMapEnabled = 1
+    !endif
+!endprocedure
+
+/'Вспомогательная процедура, отвечает за построчное отображение текста'/
+!unquoted procedure $textNewLineCutter($text, $length)
+    !while %strpos(%substr($text,%intval($length)), " ") > 0 /'Пока в строке есть пробелы после ограничителя длины $length - делать перенос'/
+    !$cutPosition = $length + %strpos(%substr($text, $length), " ") /'Поиск пробела'/
+    !$textResult = $textResult + %substr($text, 0, $cutPosition) + "\n"
+    !$text = %substr($text,%intval($cutPosition))
+    !endwhile
+    !$textResult = $textResult + $text
+!endprocedure
+
+/'Обработчик передаваемых в процедурц цветов'/
+!unquoted procedure colorController($color="")
+    !if $color == ""
+        !$colorResult = $color
+    !else
+        !$colorResult = "#"+$color
+    !endif
+!endprocedure
+
+/'Процедуры rq и rs заменяют синтаксис рисования стрелок.'/
+!unquoted procedure actionBuilder($initiator, $executor, $liveLine="",$action, $type)
+    !if $type == rq
+        !$line = "->"
+    !else
+        !$line = "-->"
+    !endif
+
+    !if $liveLine == "..."
+        $initiator $line $executor: $action
+        $liveLine
+    !else
+        $initiator $line $executor $liveLine : $action
+    !endif
+    !$id = $id + 1
+!endprocedure
+
+/'Процедура контроллер взаимодействия'/
+!unquoted procedure actionController($type, $initiator, $executor, $liveLine="",$action,$comment)
+    !if $initiator == "*"
+        %invoke_procedure("autoInsertAction", "actionController", $executor,$liveLine,$action, $comment, $processMapEnabled)
+    !else
+        !if $executor == "" && $initiator == ""
+            %invoke_procedure("getMetadataByStep",$id)
+            %invoke_procedure("actionController", $type, $getExecutor, $getInitiator, $liveLine, $action, $comment)
+        !else
+            %invoke_procedure("getOriginalLayer")
+            !if $initiator != ""
+                %invoke_procedure("aliasCheck",$initiator)
+            !endif
+            !if $executor != ""
+                %invoke_procedure("aliasCheck",$executor)
+            !endif
+            %invoke_procedure("actionBuilder", $initiator, $executor, $liveLine, $action, $type)
+            %invoke_procedure("setInitialSintaxVariable", "action", $initiator, $executor, $liveLine, $action, $type)
+            /'Для корректного отображения в карте процесса меняем исполнителя и иницатора местами'/
+            !if $type == rq
+                %invoke_procedure("setMetadataVariable", $initiator, $executor, $liveLine, $action, $comment, "request", $getOriginalLayer,$layerId)
+            !elseif $type == rs
+                %invoke_procedure("setMetadataVariable", $initiator, $executor, $liveLine, $action, $comment, "response", $getOriginalLayer,$layerId)
+            !endif
+        !endif
+    !endif
+!endprocedure
+
+/'Процедура для автовставки уже нарисованной или скопированнной стрелки'/
+!unquoted procedure autoInsertAction($source, $i, $liveLine="", $action="", $comment="", $saveOn="")
+    /'Проверяем, что нам передан номер стрелки, которую хотим вставить,
+    для этого передаем в param2 - номер, не должен быть пустым'/
+    %invoke_procedure("checkFeaturesEnabled",autoInsertAction, $source, $i)
+    %invoke_procedure("getMetadataByStep", $i, $saveOn)
+    /'Проверяем, что стрелка с этим номером есть в метаданных, для этого в процедуру
+    проверки передаем переменную $getType - если существует, проходим далее'/
+    %invoke_procedure("checkFeaturesEnabled",autoInsertAction, $source,$getType)
+    !if $getType == "request"
+        %invoke_procedure("rq", $getInitiator, $getExecutor, $liveLine, $action, $comment)
+    !elseif $getType == "response"
+        %invoke_procedure("rs", $getInitiator, $getExecutor, $liveLine, $action, $comment)
+    !endif
+!endprocedure
+
+/'Вспомогательная процедура для проверки существования участника по его алиасу'/
+!unquoted procedure aliasCheck($alias)
+    !$key = "name" + $alias
+    !if %not(%variable_exists($key))
+        !$resultName = %upper(%substr($alias,0,1)) + %substr($alias,1)
+        !$iterationCount = 0
+        !foreach $item in $aliasMap.partiyTypes
+            !if %strpos($alias, $item.item) == 0 || %strpos($alias, $item.item) > 0
+                !$iterationCount = $iterationCount + 1
+                !$aliasSearchResult = $item.type
+            !endif
+        !endfor
+        !if $iterationCount == 0
+            %invoke_procedure("parties", "participant", $resultName, $alias)
+        !else
+            %invoke_procedure("parties", $aliasSearchResult, $resultName, $alias)
+        !endif
+    !endif
+!endprocedure
+
+/'Процедура для задания имен буфферных переменнх'/
+!unquoted procedure setAuditVariableName($i)
+    !$auditIdEvent = $i + "event"
+    !$auditIdStatus = $i + "status"
+    !$auditIdStartEvent = $i + "startEvent"
+    !$auditIdFinishEvent = $i + "finishEvent"
+    !$auditIdDescriptionEvent = $i + "description"
+!endprocedure
+
+!unquoted procedure setAuditVariable($auditId, $event, $status, $startEvent, $finishEvent, $description)
+    %invoke_procedure("setAuditVariableName",$auditId)
+    %set_variable_value($auditIdEvent, $event)
+    %set_variable_value($auditIdStatus, $status)
+    %set_variable_value($auditIdStartEvent, $startEvent)
+    %set_variable_value($auditIdFinishEvent, $finishEvent)
+    %set_variable_value($auditIdDescriptionEvent, $description)
+!endprocedure
+
+!unquoted procedure getAuditVariable($i)
+    %invoke_procedure("setAuditVariableName",$i)
+    !$getEvent = %get_variable_value($auditIdEvent)
+    !$getStatusEvent = %get_variable_value($auditIdStatus)
+    !$getStartEvent = %get_variable_value($auditIdStartEvent)
+    !$getFinishEvent = %get_variable_value($auditIdFinishEvent)
+    !$getDescriptionEvent = %get_variable_value($auditIdDescriptionEvent)
+!endprocedure
+
+/'Процедура построения таблицы аудита'/
+!unquoted procedure auditMapBuilder()
+!$i = 1
+!while $i < $auditId || $i == $auditId
+%invoke_procedure("getAuditVariable", $i)
+%invoke_procedure("$textNewLineCutter", $getDescriptionEvent, $actionLength)
+!$getDescriptionEvent = $textResult
+!$textResult = ""
+| $i | $getEvent | $getStartEvent | $getFinishEvent | $getStatusEvent | $getDescriptionEvent |
+!$i = $i + 1
+!endwhile
+!endprocedure
+
+/'Процедура для построения списка процедур'/
+!unquoted procedure helpBuilder($procName="")
+    !if $procName == ""
+    !foreach $item in $procHelpMap.procedures
+%invoke_procedure("$textNewLineCutter", $item.description, $actionLength)
+!$itemDescription = $textResult
+!$textResult = ""
+%invoke_procedure("$textNewLineCutter", $item.example, $actionLength)
+!$itemExample = $textResult
+!$textResult = ""
+%invoke_procedure("$textNewLineCutter", $item.variables, $actionLength)
+!$itemVariables = $textResult
+!$textResult = ""
+| $item.name | $itemDescription | $item.originalSyntax | $itemExample | $itemVariables |
+    !endfor
+    !else
+    !foreach $item in $procHelpMap.procedures
+    !if %strpos($procName, $item.name) == 0 || %strpos($procName, $item.name) > 0
+%invoke_procedure("$textNewLineCutter", $item.description, $actionLength)
+!$itemDescription = $textResult
+!$textResult = ""
+%invoke_procedure("$textNewLineCutter", $item.example, $actionLength)
+!$itemExample = $textResult
+!$textResult = ""
+%invoke_procedure("$textNewLineCutter", $item.variables, $actionLength)
+!$itemVariables = $textResult
+!$textResult = ""
+| $item.name | $itemDescription | $item.originalSyntax | $itemExample | $itemVariables |
+    !endif
+    !endfor
+    !endif
+!endprocedure
+
+/'Процедура для здания текущего уровня layer'/
+!unquoted procedure setLayer($layerType)
+    !if $layerType != "else" && $layerType != "note" && $layerType != "ref"
+        !if $layerType == "end" || $layerType == "end box"
+            !$layerId = $layerId - 1
+        !else
+            !$layerId = $layerId + 1
+        !endif
+        !$originalLayer = $layerId + "originalLayer"
+        %set_variable_value($originalLayer,$layerType)
+    !endif
+!endprocedure
+
+/'Процедура для вычисления layer'/
+!unquoted procedure getOriginalLayer()
+    !$originalLayer = $layerId + "originalLayer"
+    !$getOriginalLayer = %get_variable_value($originalLayer)
+!endprocedure
+
+/'Формирование имен переменных для генерации кода диаграммы в исходном синтаксисе'/
+/'  parties: param1 - participantType, param2 - name, param3 - alaias, param4 - order
+    action: param1 - initiator, param2 - executor, param3 - liveline, param4 - action, param5 = actionType
+    alt,opt,par,group,loop,else: param1 - color param2 - description
+    end
+    audit: param1 - event, param2 - status, param3 - source
+    note: param1 - position1, position2 - name, param3 - color, param4 - description'/
+
+!unquoted procedure setInitialSintaxVariableName($i)
+    !$typeTechId = $i + "typeTechId"
+    !$typeParam1 =  $i + "param1TechId"
+    !$typeParam2 =  $i + "param2TechId"
+    !$typeParam3 =  $i + "param3TechId"
+    !$typeParam4 =  $i + "param4TechId"
+    !$typeParam5 =  $i + "param5TechId"
+!endprocedure
+
+/'Сохранение переменных для генерации кода диаграммы в исходном синтаксисе'/
+!unquoted procedure setInitialSintaxVariable($type, $param1="", $param2="", $param3="", $param4="", $param5="")
+    !if $initialSyntaxMapEnabled != 0
+        !$techId = $techId + 1
+        %invoke_procedure("setInitialSintaxVariableName", $techId)
+        !if $type == "action"
+            %set_variable_value($typeTechId, $type)
+            %set_variable_value($typeParam1, $param1)
+            %set_variable_value($typeParam2, $param2)
+            %set_variable_value($typeParam3, $param3)
+            %set_variable_value($typeParam4, $param4)
+            %set_variable_value($typeParam5, $param5)
+        !elseif $type == "parties" || $type == "note" || %strpos($type,"ref") == 0
+            %set_variable_value($typeTechId, $type)
+            %set_variable_value($typeParam1, $param1)
+            %set_variable_value($typeParam2, $param2)
+            %set_variable_value($typeParam3, $param3)
+            %set_variable_value($typeParam4, $param4)
+        !elseif $type == "audit"
+            %set_variable_value($typeTechId, $type)
+            %set_variable_value($typeParam1, $param1)
+            %set_variable_value($typeParam2, $param2)
+            %set_variable_value($typeParam3, $param3)
+        !elseif $type == "alt" || $type == "opt" || $type == "par" || $type == "else" || $type == "group" || $type == "box" || $type == "loop"
+            %set_variable_value($typeTechId, $type)
+            %set_variable_value($typeParam1, $param1)
+            %set_variable_value($typeParam2, $param2)
+         !elseif $type == "end" || $type == "end box"
+            %set_variable_value($typeTechId, $type)
+        !endif
+    !endif
+!endprocedure
+
+/'Запрос переменных для генерации кода диаграммы в исходном синтаксисе'/
+!unquoted procedure getInitialSintaxVariable($i)
+    %invoke_procedure("setInitialSintaxVariableName", $i)
+    !$getTypeTechId = %get_variable_value($typeTechId)
+    !$getTypeParam1 = %get_variable_value($typeParam1)
+    !$getTypeParam2 = %get_variable_value($typeParam2)
+    !$getTypeParam3 = %get_variable_value($typeParam3)
+    !$getTypeParam4 = %get_variable_value($typeParam4)
+    !$getTypeParam5 = %get_variable_value($typeParam5)
+!endprocedure
+
+/'Генерация строки кода диаграммы в исходном синтаксисе'/
+/'  parties: param1 - participantType, param2 - name, param3 - alaias, param4 - order
+    action: param1 - initiator, param2 - executor, param3 - liveline, param4 - action, param5 = actionType
+    alt,opt,par,group, loop, else: param1 - color param2 - description
+    end
+    audit: param1 - event, param2 - status, param3 - source
+    note: param1 - position1, position2 - name, param3 - color, param4 - description'/
+
+!unquoted procedure initialSintaxDiagrammRowBuilder($i)
+    %invoke_procedure("getInitialSintaxVariable", $i)
+    !if $getTypeTechId == "parties"
+    %invoke_procedure("initialSyntaxPartiesRowBuilder")
+    !elseif $getTypeTechId == "action"
+    %invoke_procedure("initialSyntaxActionRowBuilder")
+    !elseif $getTypeTechId == "box" || $getTypeTechId == "alt" || $getTypeTechId == "opt" || $getTypeTechId == "par" || $getTypeTechId == "else" || $getTypeTechId == "group" || $getTypeTechId == "loop"
+    %invoke_procedure("initialSyntaxLayerRowBuilder")
+    !elseif $getTypeTechId == "end" || $getTypeTechId == "end box"
+    %invoke_procedure("initialSyntaxEndLayerRowBuilder")
+    !elseif $getTypeTechId == "audit"
+    %invoke_procedure("initialSyntaxAuditRowBuilder")
+    !elseif $getTypeTechId == "note"
+    %invoke_procedure("initialSyntaxNoteRowBuilder")
+    !elseif %strpos($getTypeTechId,"ref") == 0
+    %invoke_procedure("initialSyntaxRefRowBuilder")
+    !endif
+!endprocedure
+
+!unquoted procedure initialSyntaxPartiesRowBuilder()
+$getTypeParam1 "$getTypeParam2" as $getTypeParam3 $getTypeParam4
+!endprocedure
+
+!unquoted procedure initialSyntaxActionRowBuilder()
+    !if $getTypeParam5 == rq
+        !if $getTypeParam3 == "..."
+$getTypeParam1 -> $getTypeParam2: $getTypeParam4
+    $getTypeParam3
+        !else
+$getTypeParam1 -> $getTypeParam2 $getTypeParam3: $getTypeParam4
+        !endif
+    !elseif $getTypeParam5 == rs
+        !if $getTypeParam3 == "..."
+$getTypeParam1 --> $getTypeParam2: $getTypeParam4
+    $getTypeParam3
+        !else
+$getTypeParam1 --> $getTypeParam2 $getTypeParam3: $getTypeParam4
+        !endif
+    !endif
+!endprocedure
+
+!unquoted procedure initialSyntaxLayerRowBuilder()
+!if $getTypeTechId == "box"
+$getTypeTechId "$getTypeParam1" #$getTypeParam2
+!else
+$getTypeTechId #$getTypeParam1 $getTypeParam2
+!endif
+!endprocedure
+
+!unquoted procedure initialSyntaxEndLayerRowBuilder()
+$getTypeTechId
+!endprocedure
+
+!unquoted procedure initialSyntaxAuditRowBuilder()
+!$auditNote = "hnote over"
+!$auditStart = "<color:red><&media-play> <color:black>"
+!$auditStop = "<color:red><&media-stop> <color:black>"
+        !if $getTypeParam2 == ""
+$auditNote $getTypeParam3 #lightyellow/lightgreen: $auditStart $getTypeParam1
+        !elseif $getTypeParam2 == "FAILURE"
+$auditNote $getTypeParam3 #orange/red: $auditStop $getTypeParam1
+        !elseif $getTypeParam2 == "SUCCESS"
+$auditNote $getTypeParam3 #lightyellow/lightgreen: $auditStop $getTypeParam1
+        !endif
+!endprocedure
+
+!unquoted procedure initialSyntaxNoteRowBuilder()
+    !if $getTypeParam1 == "" && $getTypeParam2 == ""
+note across $getTypeParam3: $getTypeParam4
+    !elseif $getTypeParam1 != "right" && $getTypeParam1 != "left" && $getTypeParam1 != "over"
+note over $getTypeParam1, $getTypeParam2 $getTypeParam3: $getTypeParam4
+    !else
+note $getTypeParam1 $getTypeParam2 $getTypeParam3: $getTypeParam4
+    !endif
+!endprocedure
+
+!unquoted procedure initialSyntaxRefRowBuilder()
+    !if $getTypeParam1 != "" && $getTypeParam2 == ""
+$getTypeTechId over $getTypeParam1: $getTypeParam4
+    !elseif $getTypeParam1 != "" && $position2 != ""
+$getTypeTechId over $getTypeParam1,$getTypeParam2: $getTypeParam4
+    !endif
+!endprocedure
+
+/'Генерация кода диаграммы в исходном синтаксисе'/
+!unquoted procedure initialSintaxDiagrammBuilder()
+!$i = 1
+!while $i < $techId || $i == $techId
+%invoke_procedure("initialSintaxDiagrammRowBuilder",$i)
+!$i = $i + 1
+!endwhile
+!endprocedure
+
+/'Процедура задания имен буфферных переменных, инициирует эти переменные'/
+!unquoted procedure setMetadataVariableName($i,$saveOn="")
+    !if $processMapEnabled == 0
+        !$idComment = $i + "comment"
+        !if $saveOn == ""
+            !$i = 0
+        !endif
+        !$idInitiator = $i + "initiator"
+        !$idExecutor = $i + "executor"
+        !$idType = $i + "type"
+    !else
+        !$idInitiator = $i + "initiator"
+        !$idExecutor = $i + "executor"
+        !$idAction = $i + "action"
+        !$idComment = $i + "comment"
+        !$idLiveline = $i + "liveline"
+        !$idType = $i + "type"
+        !$idLayer = $i + "layer"
+        !$idLayerId = $i + "layerId"
+    !endif
+!endprocedure
+
+/'Процедура сохранения метаинформации по id шага процесса'/
+!unquoted procedure setMetadataVariable($initiator, $executor, $liveline="", $action="", $comment="", $type, $layer = "", $layerId, $saveOn="")
+    %invoke_procedure("setMetadataVariableName",$id,$saveOn)
+    !if $processMapEnabled == 0
+        %set_variable_value($idInitiator,$initiator)
+        %set_variable_value($idExecutor,$executor)
+        %set_variable_value($idType,$type)
+        %set_variable_value($idComment,$comment)
+    !else
+        %set_variable_value($idInitiator,$initiator)
+        %set_variable_value($idExecutor,$executor)
+        %set_variable_value($idAction,$action)
+        %set_variable_value($idComment,$comment)
+        %set_variable_value($idLiveline,$liveline)
+        %set_variable_value($idType,$type)
+        %set_variable_value($idLayer,$layer)
+        %set_variable_value($idLayerId,$layerId)
+    !endif
+!endprocedure
+
+/'Процедура для получения информации по шагу процесса для построения карты процесса
+Соблюдением стиля кода пришлось пренебречь, т.к. иначе легенда не может построить таблицу'/
+!unquoted procedure getMetadataByStep($i,$saveOn="")
+    %invoke_procedure("setMetadataVariableName",$i, $saveOn)
+    !if $processMapEnabled == 0
+        !$getInitiator = %get_variable_value($idInitiator)
+        !$getExecutor = %get_variable_value($idExecutor)
+        !$getType = %get_variable_value($idType)
+        !$getComment = %get_variable_value($idComment)
+    !else
+        !$getAction = %get_variable_value($idAction)
+        !$getComment = %get_variable_value($idComment)
+        !$getInitiator = %get_variable_value($idInitiator)
+        !$getExecutor = %get_variable_value($idExecutor)
+        !$getLiveline = %get_variable_value($idLiveline)
+        !$getType = %get_variable_value($idType)
+        !$getLayer = %get_variable_value($idLayer)
+        !$getIdLayerId = %get_variable_value($idLayerId)
+    !endif
+!endprocedure
+
+/'Процедура для получения имен участников взаимодействия'/
+!unquoted procedure getParticipantNameByAlias($i)
+    %invoke_procedure("setMetadataVariableName",$i)
+    !$getInitiatorName = %get_variable_value("name" + %get_variable_value($idInitiator))
+    !$getExecutorName = %get_variable_value("name" + %get_variable_value($idExecutor))
+!endprocedure
+
+/'Процедура построения одной строки карты процесса'/
+!unquoted procedure processMapRowBuilder($i)
+%invoke_procedure("getMetadataByStep",$i)
+%invoke_procedure("getParticipantNameByAlias",$i)
+!if $processMapEnabled == 1
+    %invoke_procedure("$textNewLineCutter", $getAction, $actionLength)
+    !$actionText = $textResult
+    !$textResult = ""
+!endif
+!if $processMapEnabled == 1
+%invoke_procedure("$textNewLineCutter", $getComment, $commentLengthFinal)
+!else
+%invoke_procedure("$textNewLineCutter", $getComment, $commentLengthDraft)
+!endif
+!$commentText = $textResult
+!$textResult = ""
+!if $getLayer == ""
+    !$getLayer = default
+!endif
+!if $processMapEnabled == 1
+| $i | $getType | $getIdLayerId | $getLayer | $getInitiatorName | $getExecutorName | $actionText | $commentText |
+!else
+| $i | $commentText |
+!endif
+!endprocedure
+
+/'Процедура построения карты процесса'/
+!unquoted procedure processMapBuilder($i="")
+!if $i == ""
+!$i = 1
+!while $i < $id || $i == $id
+%invoke_procedure("processMapRowBuilder",$i)
+!$i = $i + 1
+!endwhile
+!else
+%invoke_procedure("processMapRowBuilder",$i)
+!endif
+!endprocedure
+
+/'Процедура добаляет на диаграмму параметры стиля'/
+!unquoted procedure styleController()
+    !foreach $item in $style
+$item
+    !endfor
+!endprocedure
+
+!$link = "**<size:17><color:blue><&link-intact></color>**"
+!$success = "**<size:20><color:green><&circle-check></color>**"
+!$error = "**<size:20><color:red><&circle-x></color>**"
+!$end = "**<size:20><color:red><&x></color>**"
+
+/'САМА ДИАГРАММА
+Данная диаграмма написана с применением библиотеки макросов автоподстановки, написанной Патрушевым Валерием.
+Ознакомиться с библиотекой можно тут: https://github.com/leraRadicovich/plantUML_Lib
+=========================================================================================================================
+'/
+
+header <color:black>SequenceLib.v.3.1.Lite\n <color:black>by PVR
+
+/'Процедура построения таблицы со списком доработок'/
+!unquoted procedure todoListBuilder()
+!$i = 1
+!while $i < $todoId || $i == $todoId
+!$key = $i + "step"
+!$desc =$i  + "todotext"
+!$getTodoIdStep = %get_variable_value($key)
+!$getTodoIdDescription = %get_variable_value($desc)
+%invoke_procedure("$textNewLineCutter", $getTodoIdDescription, $commentLengthFinal)
+!$getTodoIdDescription = $textResult
+!$textResult = ""
+| $i | $getTodoIdStep | $getTodoIdDescription |
+!$i = $i + 1
+!endwhile
+!endprocedure
+
+/'3. ФУНКЦИОНАЛЬНЫЕ ПРОЦЕДУРЫ
+========================================================================================
+Процедуры, заменяющие штатные средства plantUml, например: создание участников,
+отрисовка стрелок, отрисовка таблиц и т.д.'/
+
+/'Процедура для задания конфигурации документа'/
+!unquoted procedure diagrammInit($mode, $originalSyntaxRequired="", $sequenceName="")
+    %invoke_procedure("setConfiguration",$mode, $originalSyntaxRequired)
+    %invoke_procedure("checkFeaturesEnabled",diagrammInit,$mode)
+    %invoke_procedure("styleController")
+    !if $originalSyntaxRequired == ""
+title = Диаграмма: <color:blue>$sequenceName\n Тип: <color:blue>$mode</color>; Генерация кода в оригинальном синтаксисе: <color:blue>**выключена**
+    !else
+title = Диаграмма: <color:blue>$sequenceName\n Тип: <color:blue>$mode</color>; Генерация кода в оригинальном синтаксисе: <color:blue>**включена**
+    !endif
+!endprocedure
+
+/'Строим крату процесса, таблицу событий аудита и список доработок'/
+!unquoted procedure LEGEND()
+%invoke_procedure("checkFeaturesEnabled",LEGEND)
+legend  left
+!if $processMapEnabled == 1
+**КАРТА ПРОЦЕССА**
+====
+$processMapFinal
+%invoke_procedure("processMapBuilder")
+====
+!else
+**КОММЕНТАРИИ**
+====
+$processMapDraft
+%invoke_procedure("processMapBuilder")
+====
+!endif
+!if $auditMapEnabled == 1
+**СОБЫТИЯ АУДИТА**
+====
+$auditTable
+%invoke_procedure("auditMapBuilder")
+====
+!endif
+!if $todoMapEnabled == 1
+**СПИСОК ДОРАБОТОК**
+====
+$todoList
+%invoke_procedure("todoListBuilder")
+!endif
+end legend
+!endprocedure
+
+!unquoted procedure ORIGINAL()
+%invoke_procedure("checkFeaturesEnabled",ORIGINAL)
+!if $initialSyntaxMapEnabled == 0
+note across: Генерация кода в оригинальном синтаксие PlantUml отключена
+!else
+note across
+%string("@startuml")
+%invoke_procedure("styleController")
+
+header <color:black>Код диаграммы сгенерирован\nв SequenceLib.v.3.1.Lite\n <color:black>by PVR
+
+%invoke_procedure("initialSintaxDiagrammBuilder")
+%invoke_procedure("LEGEND")
+%string("@enduml")
+end note
+!endif
+!endprocedure
+
+!unquoted procedure HELP($procName="")
+note across
+**ОПИСАНИЕ ПРОЦЕДУР БИБЛИОТЕКИ**
+====
+$proceduresDescription
+%invoke_procedure("helpBuilder",$procName)
+end note
+!endprocedure
+
+/'Процедуры для работы с вызовами и ответами'/
+!unquoted procedure rq($initiator, $executor, $liveLine="",$action, $comment="")
+    %invoke_procedure("actionController", "rq", $initiator, $executor, $liveLine, $action, $comment)
+!endprocedure
+
+!unquoted procedure rs($initiator, $executor, $liveLine="",$action, $comment="")
+    %invoke_procedure("actionController", "rs", $initiator, $executor, $liveLine, $action, $comment)
+!endprocedure
+
+/'Процедура для активации линии жизни'/
+!unquoted procedure ACTIVATE($party="")
+activate $party
+!endprocedure
+
+/'Процедура для деактивации линии жизни'/
+!unquoted procedure DEACTIVATE($party="")
+deactivate $party
+!endprocedure
+
+/'Процедура копирования при выключенной карте процесса'/
+!unquoted procedure copyAction()
+    !if $processMapEnabled == 0
+        !$copyId = $copyId + 1
+        %invoke_procedure("checkFeaturesEnabled",copyAction)
+        %invoke_procedure("getMetadataByStep",$id)
+        %invoke_procedure("setMetadataVariable", $getInitiator, $getExecutor, $liveLine, $action, $getComment, $getType,"",$layerId,1)
+    !endif
+!endprocedure
+
+/'Процедура, создающая и запоминающая идентификатор - якорь'/
+!unquoted procedure anchor($name)
+    %set_variable_value($name,$id)
+!end procedure
+
+/'Вспомогательная процедура отрисовки участников: формирует мапу имя:алиас'/
+!unquoted procedure parties($partyType, $name, $alias="", $order="")
+    %invoke_procedure("checkFeaturesEnabled", parties, $alias)
+    !if $order != ""
+        $partyType "$name" as $alias order $order
+    !else
+        $partyType "$name" as $alias
+    !endif
+    !$aliasName = "name" + $alias
+    %set_variable_value($aliasName,$name)
+    %invoke_procedure("setInitialSintaxVariable", "parties", $partyType, $name, $alias, $order)
+!endprocedure
+
+/'Процедура для обработки событий Аудит'/
+!unquoted procedure audit($event, $status = "", $description = "", $source = "pafp")
+    !if $status == ""
+        !$startEvent = "start" + $event
+        %set_variable_value($startEvent,$id)
+        hnote over $source #lightyellow/lightgreen: <color:red><&media-play> <color:black>$event
+    !else
+        !$auditId = $auditId + 1
+        !$key = "start" + $event
+        !$startEvent = %get_variable_value($key)
+
+        !if $auditMapEnabled == 1
+            %invoke_procedure("setAuditVariable", $auditId, $event, $status, $startEvent, $id, $description)
+        !endif
+
+        !if $status == "FAILURE"
+            hnote over $source #orange/red: <color:red><&media-stop> <color:black>$event
+        !else
+            hnote over $source #lightyellow/lightgreen: <color:red><&media-stop> <color:black>$event
+        !endif
+    !endif
+    %invoke_procedure("setInitialSintaxVariable", "audit", $event, $status, $source)
+!end procedure
+
+/'Процедура, отображающая таблицу событий аудита'/
+!unquoted procedure auditNote()
+!if $auditMapEnabled == 1
+note across
+**СОБЫТИЯ АУДИТА**
+====
+$auditTable
+%invoke_procedure("auditMapBuilder")
+end note
+!endif
+!end procedure
+
+/'Процедура для группировки участников box'/
+!unquoted procedure BOX($name, $color)
+    !$layerType = "box"
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $name, $color)
+    %invoke_procedure("colorController",$color)
+    $layerType $name $colorResult
+!endprocedure
+
+/'Процедура для отрисовки альтернативных сценариев alt'/
+!unquoted procedure ALT($color, $description)
+    !$layerType = "alt"
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $color,$description)
+    %invoke_procedure("colorController",$color)
+    $layerType $colorResult $description
+!endprocedure
+
+/'Процедура для отрисовки опциональных сценариев opt'/
+!unquoted procedure OPT($color,$description)
+    !$layerType = "opt"
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $color,$description)
+    $layerType $colorResult $description
+!endprocedure
+
+/'Процедура для отрисовки параллельных сценариев par'/
+!unquoted procedure PAR($color,$description)
+    !$layerType = "alt"
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $color,$description)
+    %invoke_procedure("colorController",$color)
+    $layerType $colorResult $description
+!endprocedure
+
+/'Процедура для отрисовки группировки сценариев group'/
+!unquoted procedure GROUP($color,$description)
+    !$layerType = "group"
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $color, $description)
+    %invoke_procedure("colorController",$color)
+    $layerType $colorResult $description
+!endprocedure
+
+/'Процедура для отрисовки зацикливания сценариев loop'/
+!unquoted procedure LOOP($color,$description)
+    !$layerType = "loop"
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $color, $description)
+    %invoke_procedure("colorController",$color)
+    $layerType $colorResult $description
+!endprocedure
+
+/'Процедура для отрисовки еще одной развилки для текущего слоя layer'/
+!unquoted procedure ELSE($color,$description)
+    %invoke_procedure("checkFeaturesEnabled",ELSE,$layerId)
+    !$layerType = "else"
+    %invoke_procedure("setLayer", $layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $color,$description)
+    %invoke_procedure("colorController",$color)
+    $layerType $colorResult $description
+!endprocedure
+
+/'Процедура для завершения любых не дефолтных сценариев end'/
+!unquoted procedure END()
+    %invoke_procedure("checkFeaturesEnabled",END,$layerId)
+    %invoke_procedure("getOriginalLayer")
+    !if $getOriginalLayer == "box"
+        !$layerType = "end box"
+    !else
+        !$layerType = "end"
+    !endif
+    %invoke_procedure("setLayer",$layerType)
+    %invoke_procedure("setInitialSintaxVariable", $layerType)
+    $layerType
+!endprocedure
+
+/'note: param1 - position1, position2 - name, param3 - color, param4 - description'/
+!unquoted procedure NOTE($position1, $position2, $color="", $description)
+    %invoke_procedure("checkFeaturesEnabled",NOTE,$position1, $position2)
+    %invoke_procedure("colorController",$color)
+    !$layerType = "note"
+    %invoke_procedure("setLayer",$layerType)
+    !if $position1 == "" && $position2 == ""
+note across $colorResult:$description
+    !elseif $position1 != "right" && $position1 != "left" && $position1 != "over"
+    %invoke_procedure("aliasCheck",$position1)
+    %invoke_procedure("aliasCheck",$position2)
+note over $position1,$position2 $colorResult:$description
+    !else
+    %invoke_procedure("aliasCheck",$position2)
+note $position1 $position2 $colorResult:$description
+    !endif
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $position1, $position2, $colorResult, $description)
+!endprocedure
+
+/'Процедура для отрисовки ссылок ref'/
+!unquoted procedure REF($position1, $position2, $color="", $description)
+    %invoke_procedure("colorController",$color)
+    !$layerType = "ref"+$colorResult
+    %invoke_procedure("setLayer",$layerType)
+    !if $position1 != "" && $position2 == ""
+    %invoke_procedure("aliasCheck",$position1)
+$layerType over $position1: $description
+    !else
+    %invoke_procedure("aliasCheck",$position1)
+    %invoke_procedure("aliasCheck",$position2)
+$layerType over $position1,$position2: $description
+    !endif
+    %invoke_procedure("setInitialSintaxVariable", $layerType, $position1, $position2, $color, $description)
+!endprocedure
+
+/'Процедура, отвечающая за отображение таблицы с описанием процесса.'/
+!unquoted procedure processMapNote($x = "")
+    /'Строим крату процесса'/
+    !if $processMapEnabled == 1
+    note across
+**КАРТА ПРОЦЕССА**
+$processMapFinal
+    !if $x == ""
+        %invoke_procedure("processMapBuilder")
+    !else
+        %invoke_procedure("processMapBuilder", $id)
+    !endif
+    end note
+    !endif
+!end procedure
+
+/'Процедура создания списка дел'/
+!unquoted procedure todo($td)
+    !if $todoMapEnabled == 1
+        !$todoId = $todoId + 1
+        !$todoIdStep = $todoId + "step"
+        !$todoIdDescription = $todoId + "todotext"
+        %set_variable_value($todoIdStep, $id)
+        %set_variable_value($todoIdDescription, $td)
+    !endif
+!endprocedure
+
+/'Процедура, отображающая таблицу с заметками'/
+!unquoted procedure todoNote()
+!if $todoMapEnabled == 1
+note across
+Список доработок
+====
+$todoList
+%invoke_procedure("todoListBuilder")
+end note
+!endif
+!end procedure
