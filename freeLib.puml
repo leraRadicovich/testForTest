@@ -325,7 +325,7 @@
         !assert Процедура не доступна для вызова вне сервисной логики
     !elseif $feature == autoInsertAction && $param2 == ""
         !assert Указатель на шаг сценария $i не передан или стрелка с этим указателем не скопирована
-    !elseif $feature == autoInsertAction && %intval($param2) > %intval($id)
+    !elseif $feature == autoInsertAction && $param2 > $id
         !assert В текущий момент на диаграмме нет стрелки с этим номером
     !endif
 
