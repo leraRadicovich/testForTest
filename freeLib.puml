@@ -455,12 +455,12 @@
 /'Процедура для автовставки уже нарисованной или скопированнной стрелки'/
 !unquoted procedure autoInsertAction($source, $i, $liveLine="", $action="", $comment="", $saveOn="")
     /'Проверяем, что нам передан номер стрелки, которую хотим вставить,
-    для этого передаем в param2 - номер, не должен быть пустым'/
+    не пустой и существует, т.е. не больше текущего значения id'/
     %invoke_procedure("checkFeaturesEnabled",autoInsertAction, $source, $i)
     %invoke_procedure("getMetadataByStep", $i, $saveOn)
     /'Проверяем, что стрелка с этим номером есть в метаданных, для этого в процедуру
-    проверки передаем переменную $getType - если существует, проходим далее'/
-    %invoke_procedure("checkFeaturesEnabled",autoInsertAction, $source,$getType)
+    проверки передаем переменную $getType - если существует, проходим далее
+    %invoke_procedure("checkFeaturesEnabled",autoInsertAction, $source,$getType)'/
     !if $getType == "request"
         %invoke_procedure("rq", $getInitiator, $getExecutor, $liveLine, $action, $comment)
     !elseif $getType == "response"
@@ -1197,3 +1197,4 @@ $todoList
 end note
 !endif
 !end procedure
+
