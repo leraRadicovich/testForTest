@@ -1,0 +1,19 @@
+@startuml
+!unquoted procedure printAction($type, $initiator, $executor, $liveline, $action, $comment)
+    !if $type == "rq"
+        !$arrowType = "->"
+    !else
+        !$arrowType = "-->"
+    !endif
+
+    !if $liveline == "..."
+        $initiator $arrowType $executor : $action
+        $liveline
+    !else
+        $initiator $arrowType $executor $liveline: $action
+    !endif
+
+    !$id = $id + 1
+    %invoke_procedure("setVar", $type, $initiator, $executor, $action, $comment)
+!endprocedure
+

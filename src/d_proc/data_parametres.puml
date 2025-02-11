@@ -1,0 +1,16 @@
+@startuml
+!$id = 0
+
+!$initiatorId = ""
+!$executorId = ""
+!$actionTypeId = ""
+!$actionId = ""
+!$commentId = ""
+
+!$param1 = ""
+!$param2 = ""
+!$param3 = ""
+!$param4 = ""
+!$param5 = ""
+
+!$processMapTableTitle = "| # | from | to | type | act | comment |"

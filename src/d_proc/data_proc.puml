@@ -1,0 +1,31 @@
+@startuml
+!unquoted procedure setVarName($i)
+    !$initiatorId = $i + "initiator"
+    !$executorId = $i + "executor"
+    !$actionTypeId = $i + "actionType"
+    !$actionId = $i + "action"
+    !$commentId = $i + "comment"
+!endprocedure
+
+!unquoted procedure setVar($actionType, $initiator, $executor, $action, $comment)
+    %invoke_procedure("setVarName", $id)
+    %set_variable_value($initiatorId, $initiator)
+    %set_variable_value($executorId, $executor)
+    %set_variable_value($actionTypeId, $actionType)
+    %set_variable_value($actionId, $action)
+    %set_variable_value($commentId, $comment)
+!endprocedure
+
+!unquoted procedure getVar($i)
+%invoke_procedure("setVarName", $i)
+!$param1 = %get_variable_value($initiatorId)
+!$param2 = %get_variable_value($executorId)
+!$param3 = %get_variable_value($actionTypeId)
+!$param4 = %get_variable_value($actionId)
+!$param5 = %get_variable_value($commentId)
+!endprocedure
+
+
+
+
+

@@ -1,0 +1,9 @@
+@startuml
+!unquoted procedure rq($initiator, $executor, $liveline, $action, $comment)
+    %invoke_procedure("printAction", "rq", $initiator, $executor, $liveline, $action, $comment)
+!endprocedure
+
+!unquoted procedure rs($initiator, $executor, $liveline, $action, $comment)
+    %invoke_procedure("printAction", "rs", $initiator, $executor, $liveline, $action, $comment)
+!endprocedure
+

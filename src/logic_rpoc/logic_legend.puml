@@ -1,0 +1,13 @@
+@startuml
+!unquoted procedure legendRowBuilder($i)
+%invoke_procedure("getVar", $i)
+| $i | $param1 | $param2 | $param3 | $param4 | $param5 |
+!endprocedure
+
+!unquoted procedure legendTableBuilder()
+    !$i = 0
+    !while $i < $id
+    !$i = $i + 1
+%invoke_procedure("legendRowBuilder",$i)
+    !endwhile
+!endprocedure

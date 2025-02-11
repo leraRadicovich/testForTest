@@ -1,0 +1,7 @@
+@startuml
+!unquoted procedure LEGEND()
+legend left
+$processMapTableTitle
+%invoke_procedure("legendTableBuilder")
+end legend
+!endprocedure

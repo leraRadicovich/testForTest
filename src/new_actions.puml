@@ -1,0 +1,11 @@
+@startuml
+!include includeFile.puml
+autonumber
+
+rq(Alice,Bob,++,text,comment)
+rq(Bob,Bob,,text,comment)
+rs(Bob,Alice,...,text,comment)
+rs(Bob,Alice,--,text,comment)
+
+LEGEND()
+@enduml
